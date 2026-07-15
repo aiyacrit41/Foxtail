@@ -6,6 +6,8 @@ tequila,Tequila,alcohol,45,38,0,0,2,#9abd9c,
 whiskey,Whiskey,alcohol,50,40,1,0,3,#b08245,
 triple_sec,Triple Sec,alcohol,35,30,6,1,0,#f7e2ad,
 single_malt,Single Malt,alcohol,37.5,30,1,0,3,#f1f0ea,
+wine_white,White Wine,alcohol,50,30,3,3,1,#fff6d9
+wine_red,Red Wine,alcohol,50,30,3,3,1,#7a1d39
 lime,น้ำมะนาว,juice,15,0,0,9,0,#c5e079,
 lemom,น้ำเลมอน,juice,15,0,4,7,0,#ffea4d,
 coconut,น้ำมะพร้าว,juice,15,0,5,0,1,#ffffff,
@@ -19,3 +21,6 @@ tonic_water,โทนิควอเตอร์,tonic,12.5,0,2,1,3,#eef4ef,
 ginger_beer,จินเจอร์เบียร์,tonic,15,0,3,1,2,#e8e3d5,
 cola,โคล่า,tonic,12.5,0,7,0,1,#4a2712,
 bitters,Angostura Bitters,other,7.5,45,0,0,9,#7a2e1d,drop
+citric,citric acid,other,10,0,0,5,0,#ffea00,drop
+malic,malic acid,other,10,0,0,5,0,#b0eb94,drop
+foam,foamer,other,10,0,0,0,0,#d4d4d4,drop
