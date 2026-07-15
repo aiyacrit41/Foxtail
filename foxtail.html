@@ -1,0 +1,1571 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="color-scheme" content="dark">
+<meta name="theme-color" content="#1E2429">
+<title>Foxtail</title>
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Mali:wght@300;500;600;700&family=Caveat:wght@600&display=swap" rel="stylesheet">
+<style>
+  /* ===== Foxtail CI palette =====
+     Shadow: #252D33 / #1E2429 / #161B1F
+     Sand:   #F0E7DB / #E6DDD2 / #D8D0C6
+     Fox:    Brown #673311 · Red #A65100 · Swift #CF9959
+             Fennec #C7A163 · Arctic #17203B · Gray #828585 */
+  :root {
+    --paper: #1E2429;             /* Natural Shadow */
+    --ink: #F0E7DB;               /* Bright Sand */
+    --ink-soft: #B8AFA2;          /* Sand จางลง */
+    --coral: #CF9959;             /* Swift Fox — แอคเซนต์หลัก */
+    --teal: #5A6C96;              /* Arctic Fox สว่างขึ้น — โทนเย็น/น้ำแข็ง */
+    --mustard: #C7A163;           /* Fennec Fox */
+    --wash-coral: rgba(166,81,0,0.30);    /* Red Fox wash */
+    --wash-teal: rgba(90,108,150,0.28);   /* Arctic wash */
+    --wash-mustard: rgba(199,161,99,0.24);/* Fennec wash */
+    --wash-plum: rgba(23,32,59,0.55);     /* Arctic Fox เข้ม */
+    --surface: rgba(240,231,219,0.07);
+    --surface-on: rgba(240,231,219,0.15);
+  }
+  html { color-scheme: dark; }
+  * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+  body {
+    font-family: 'Mali', cursive;
+    background-color: #1E2429;
+    margin: 0;
+    color: var(--ink);
+    min-height: 100vh;
+    line-height: 1.55;
+  }
+  /* gradient คงที่เต็มจอ (ใช้ fixed layer กันบั๊ก background-attachment บน iOS) */
+  body::before {
+    content: "";
+    position: fixed;
+    inset: 0;
+    z-index: -1;
+    background: linear-gradient(180deg, #252D33 0%, #161B1F 100%);
+  }
+
+  .sketch {
+    border: 2px solid var(--ink);
+    border-radius: 255px 18px 225px 18px / 18px 225px 18px 255px;
+  }
+  .sketch-soft {
+    border: 1.6px solid rgba(240,231,219,0.45);
+    border-radius: 16px 100px 18px 120px / 100px 16px 120px 18px;
+  }
+
+  .page { display: none; min-height: 100vh; }
+  .page.active { display: block; }
+  h1, h2 { font-weight: 700; }
+  .en { font-family: 'Caveat', cursive; }
+
+  .btn {
+    font-family: 'Mali', cursive;
+    font-weight: 600;
+    font-size: 15px;
+    color: var(--ink);
+    background: var(--surface);
+    padding: 12px 18px;
+    cursor: pointer;
+    border: 2px solid var(--ink);
+    border-radius: 255px 18px 225px 18px / 18px 225px 18px 255px;
+  }
+  .btn.fill-coral { background: var(--wash-coral); }
+  .btn.fill-teal { background: var(--wash-teal); }
+  .btn.fill-mustard { background: var(--wash-mustard); }
+  .btn:disabled { opacity: 0.35; }
+  .btn:active { transform: rotate(-0.6deg) scale(0.98); }
+
+  /* ================= HOME ================= */
+  #page-home {
+    display: none;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 40px 24px;
+    text-align: center;
+  }
+  #page-home.active { display: flex; }
+  .home-title { font-size: 24px; margin: 0; line-height: 1.4; }
+  .home-title .tagline {
+    display: block;
+    white-space: nowrap;
+    font-size: clamp(14px, 4.6vw, 19px);
+    letter-spacing: 0.2px;
+  }
+  .home-title .tail {
+    width: 0.72em;
+    height: 0.72em;
+    margin-left: 10px;
+    vertical-align: -0.06em;
+    transform: rotate(14deg);
+  }
+  .home-title .en {
+    font-size: 64px;
+    display: block;
+    color: var(--coral);
+    transform: rotate(-2deg);
+    line-height: 1.05;
+    margin-bottom: 10px;
+    text-shadow: 2px 2px 0 rgba(0,0,0,0.35);
+  }
+  .home-sub { color: var(--ink-soft); font-size: 14px; margin: 10px 0 26px; font-weight: 500; }
+  .name-field {
+    width: 100%;
+    max-width: 340px;
+    margin-bottom: 26px;
+    text-align: left;
+  }
+  .name-field label {
+    display: block;
+    font-size: 13px;
+    color: var(--ink-soft);
+    font-weight: 600;
+    margin: 0 6px 5px;
+  }
+  .name-field input {
+    width: 100%;
+    padding: 12px 18px;
+    font-family: 'Mali', cursive;
+    font-size: 16px;
+    font-weight: 600;
+    color: var(--ink);
+    background: var(--surface);
+    border: 2px solid var(--ink);
+    border-radius: 255px 18px 225px 18px / 18px 225px 18px 255px;
+    outline: none;
+  }
+  .name-field input:focus { background: rgba(240,231,219,0.13); }
+  .name-field input::placeholder { color: #7B7264; }
+  .mode-card {
+    width: 100%;
+    max-width: 340px;
+    padding: 20px;
+    margin-bottom: 16px;
+    cursor: pointer;
+    text-align: left;
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    background: var(--surface);
+  }
+  .mode-card .icon { font-size: 34px; }
+  .home-logo { width: 150px; margin-top: 28px; opacity: 0.8; filter: brightness(0) invert(0.92); }
+  .mode-card h2 { margin: 0 0 3px; font-size: 18px; }
+  .mode-card p { margin: 0; font-size: 12.5px; color: var(--ink-soft); font-weight: 500; }
+
+  /* ================= COMMON HEADER ================= */
+  .topbar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 14px 16px 6px;
+  }
+  .back { font-size: 14px; font-weight: 600; cursor: pointer; color: var(--ink-soft); }
+  .topbar .title { font-size: 17px; font-weight: 700; }
+
+  /* ================= QUIZ ================= */
+  .quiz-body { padding: 8px 22px 40px; max-width: 480px; margin: 0 auto; }
+  .quiz-progress { font-family: 'Caveat', cursive; font-size: 24px; color: var(--coral); }
+  .quiz-q { font-size: 20px; margin: 6px 0 20px; line-height: 1.45; }
+  .quiz-opt {
+    display: block;
+    width: 100%;
+    text-align: left;
+    padding: 13px 16px;
+    margin-bottom: 12px;
+    font-family: 'Mali', cursive;
+    font-size: 15px;
+    font-weight: 500;
+    line-height: 1.5;
+    color: var(--ink);
+    background: var(--surface);
+    cursor: pointer;
+  }
+  .quiz-opt:active { background: var(--wash-teal); }
+
+  /* ================= STORY ================= */
+  .story-body { padding: 8px 22px 40px; max-width: 480px; margin: 0 auto; }
+  .story-lead { font-size: 14px; color: var(--ink-soft); font-weight: 500; margin: 4px 0 14px; line-height: 1.6; }
+  #story-text {
+    width: 100%;
+    min-height: 116px;
+    resize: none;
+    padding: 14px 16px;
+    font-family: 'Mali', cursive;
+    font-size: 15px;
+    font-weight: 500;
+    color: var(--ink);
+    background: var(--surface);
+    border: 2px solid var(--ink);
+    border-radius: 18px 120px 22px 140px / 120px 18px 140px 22px;
+    outline: none;
+    line-height: 1.65;
+  }
+  #story-text:focus { background: rgba(240,231,219,0.13); }
+  #story-text::placeholder { color: #7B7264; }
+  .story-count { text-align: right; font-size: 12px; color: var(--ink-soft); margin: 6px 4px 14px; font-weight: 500; }
+  .story-hint { font-size: 13px; color: var(--mustard); min-height: 20px; margin-top: 12px; font-weight: 600; text-align: center; }
+
+  /* ================= RESULT CARD ================= */
+  .card-page-body {
+    padding: 10px 20px 40px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+  }
+  .result-card-img {
+    width: 100%;
+    max-width: 360px;
+    border-radius: 6px;
+    box-shadow: 4px 6px 18px rgba(0,0,0,0.5);
+  }
+  .card-actions { display: flex; gap: 10px; margin-top: 18px; flex-wrap: wrap; justify-content: center; }
+  .hint { font-size: 12px; color: var(--ink-soft); margin-top: 10px; font-weight: 500; }
+
+  /* ================= MIX PAGE ================= */
+  .shaker-section {
+    position: sticky;
+    top: 0;
+    z-index: 20;
+    background: linear-gradient(180deg, #252D33 86%, rgba(37,45,51,0));
+    padding: 2px 16px 16px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 14px;
+    max-width: 520px;
+    margin: 0 auto;
+  }
+  .shaker-wrap {
+    flex-shrink: 0;
+    width: clamp(150px, 44vw, 200px);
+    position: relative;
+  }
+  .shaker-blob {
+    position: absolute;
+    inset: 14% -6% 6% -6%;
+    background: var(--wash-mustard);
+    border-radius: 60% 40% 55% 45% / 45% 55% 40% 60%;
+    filter: blur(18px);
+  }
+  #shaker-svg { position: relative; width: 100%; height: auto; display: block; }
+  #shaker-svg.shaking { animation: shake 0.85s ease-in-out; }
+  @keyframes shake {
+    0%, 100% { transform: rotate(0) translateY(0); }
+    15% { transform: rotate(-9deg) translateY(-6px); }
+    30% { transform: rotate(8deg) translateY(2px); }
+    45% { transform: rotate(-7deg) translateY(-5px); }
+    60% { transform: rotate(6deg) translateY(1px); }
+    75% { transform: rotate(-4deg) translateY(-3px); }
+  }
+  .ice-cube { animation: bob 2.6s ease-in-out infinite; transform-box: fill-box; transform-origin: center; }
+  .ice-cube:nth-child(2) { animation-delay: -0.9s; animation-duration: 3.1s; }
+  .ice-cube:nth-child(3) { animation-delay: -1.7s; animation-duration: 2.9s; }
+  @keyframes bob {
+    0%, 100% { transform: translateY(0) rotate(0deg); }
+    50% { transform: translateY(3.5px) rotate(4deg); }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .ice-cube, #shaker-svg.shaking { animation: none; }
+  }
+
+  .shaker-info { flex: 1; min-width: 0; max-width: 220px; }
+  .fill-label { font-size: 13px; color: var(--ink-soft); margin-bottom: 8px; font-weight: 500; }
+  .fill-label b { color: var(--ink); font-size: 20px; font-weight: 700; }
+  .ice-toggle {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    font-family: 'Mali', cursive;
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--ink-soft);
+    background: var(--surface);
+    border: 1.6px solid rgba(240,231,219,0.45);
+    border-radius: 16px 60px 18px 70px / 60px 16px 70px 18px;
+    padding: 6px 14px;
+    cursor: pointer;
+    margin-bottom: 10px;
+    transition: background 0.2s;
+  }
+  .ice-toggle.on {
+    background: var(--wash-teal);
+    color: var(--ink);
+    border-color: var(--ink);
+  }
+  .taste-bars { display: flex; flex-direction: column; gap: 5px; }
+  .bar-row { display: flex; align-items: center; gap: 8px; font-size: 11px; }
+  .bar-label { width: 42px; color: var(--ink-soft); font-weight: 500; }
+  .bar-track {
+    flex: 1; height: 9px;
+    border: 1.4px solid rgba(240,231,219,0.4);
+    border-radius: 6px 60px 8px 50px / 50px 8px 60px 6px;
+    overflow: hidden;
+    background: rgba(240,231,219,0.06);
+  }
+  .bar-fill { height: 100%; transition: width 0.25s; opacity: 0.9; }
+  .match-name { font-size: 13px; color: var(--coral); margin-top: 8px; min-height: 20px; font-weight: 600; }
+
+  .ingredients { padding: 0 18px 130px; max-width: 520px; margin: 0 auto; }
+  .category h3 {
+    font-size: 15px;
+    margin: 20px 0 10px;
+    display: inline-block;
+    padding: 3px 16px;
+    position: relative;
+    color: #fff;
+    text-shadow: 0 1px 2px rgba(0,0,0,0.35);
+  }
+  .category h3 .wash {
+    position: absolute;
+    inset: -1px -5px;
+    border-radius: 60% 40% 50% 50% / 45% 60% 40% 55%;
+    filter: blur(2px);
+    z-index: -1;
+    opacity: 0.92;
+  }
+  .ing-card {
+    background: var(--surface);
+    padding: 10px 14px;
+    margin-bottom: 10px;
+    transition: background 0.2s;
+  }
+  .ing-card.on { background: var(--surface-on); }
+  .ing-top { display: flex; align-items: center; gap: 9px; margin-bottom: 2px; }
+  .swatch {
+    width: 15px; height: 15px;
+    border-radius: 60% 40% 55% 45% / 45% 55% 40% 60%;
+    border: 1.3px solid rgba(240,231,219,0.45);
+    flex-shrink: 0;
+  }
+  .ing-name { font-weight: 600; font-size: 14px; flex: 1; }
+  .ing-abv { font-size: 11px; color: var(--ink-soft); font-weight: 500; }
+  .slider-row { display: flex; align-items: center; gap: 10px; }
+  input[type=range] { flex: 1; accent-color: var(--coral); height: 30px; }
+  .amount { min-width: 52px; text-align: right; font-size: 13px; font-weight: 700; color: var(--coral); }
+  .amount.zero { color: #5F584D; }
+
+  /* drop stepper (bitters ฯลฯ) */
+  .drop-row { display: flex; align-items: center; gap: 10px; padding: 4px 0 2px; }
+  .drop-btn {
+    width: 34px; height: 34px;
+    font-family: 'Mali', cursive;
+    font-size: 18px; font-weight: 700;
+    color: var(--ink);
+    background: var(--surface);
+    border: 1.8px solid var(--ink);
+    border-radius: 60% 40% 55% 45% / 45% 55% 40% 60%;
+    cursor: pointer;
+  }
+  .drop-btn:disabled { opacity: 0.3; }
+  .drop-dots { flex: 1; display: flex; gap: 7px; align-items: center; }
+  .drop-dot {
+    width: 13px; height: 15px;
+    border: 1.4px solid rgba(240,231,219,0.4);
+    border-radius: 50% 50% 55% 55% / 35% 35% 70% 70%;
+    background: rgba(240,231,219,0.06);
+  }
+  .drop-dot.filled { background: #A65100; border-color: var(--ink); }
+
+  .confirm-bar {
+    position: fixed;
+    bottom: 0; left: 0; right: 0;
+    padding: 12px 16px calc(14px + env(safe-area-inset-bottom));
+    background: linear-gradient(0deg, #161B1F 72%, rgba(22,27,31,0));
+    display: flex;
+    gap: 8px;
+    z-index: 30;
+    max-width: 520px;
+    margin: 0 auto;
+  }
+  .confirm-bar .btn { font-size: 13px; padding: 12px 10px; }
+  .btn-main { flex: 1; }
+
+  .loading { text-align: center; padding: 40px; color: var(--ink-soft); }
+</style>
+</head>
+<body>
+
+<!-- ============ HOME ============ -->
+<div class="page active" id="page-home">
+  <h1 class="home-title">
+    <span class="en">Foxtail<svg class="tail" viewBox="0 0 64 64" aria-hidden="true">
+      <path d="M 14 58 C 5 42 7 22 24 10 C 33 4 46 3 55 9 C 44 13 37 22 34 33 C 31 45 25 54 14 58 Z" fill="#CF9959"/>
+      <path d="M 14 58 C 10 52 10 45 16 40 C 22 43 23 51 14 58 Z" fill="#F0E7DB"/>
+    </svg></span>
+    <span class="tagline">คุณคือศิลปิน แก้วนี้คือผืนผ้าใบ</span>
+  </h1>
+  <p class="home-sub">~ ผสมสี ผสมรส ในแบบของคุณเอง ~</p>
+
+  <div class="name-field">
+    <label for="cust-name">ชื่อศิลปิน (จะอยู่บนการ์ดของคุณ)</label>
+    <input type="text" id="cust-name" placeholder="ใส่ชื่อของคุณ..." maxlength="24" autocomplete="off">
+  </div>
+
+  <div class="mode-card sketch" onclick="showPage('mix')">
+    <span class="icon">🎨</span>
+    <div>
+      <h2>ผสมค็อกเทลเอง</h2>
+      <p>เลือกส่วนผสม กำหนดสัดส่วนอิสระ วาดรสชาติในแบบของคุณ</p>
+    </div>
+  </div>
+
+  <div class="mode-card sketch" onclick="startQuiz()">
+    <span class="icon">🔮</span>
+    <div>
+      <h2>ให้เราเดารสที่ใช่</h2>
+      <p>ผจญภัยไปกับจิ้งจอกแห่งการสรรค์สร้าง 8 ตอน (ใช้เวลาประมาณ 5 นาที) แล้วรับการ์ดค็อกเทลที่เข้ากับคุณ</p>
+    </div>
+  </div>
+
+  <div class="mode-card sketch" onclick="showPage('story')">
+    <span class="icon">📖</span>
+    <div>
+      <h2>เล่าเรื่องให้เราฟัง</h2>
+      <p>พิมพ์เรื่องราวสั้นๆ ไม่เกิน 150 ตัวอักษร แล้วรับแก้วที่ปรุงจากเรื่องของคุณ</p>
+    </div>
+  </div>
+
+  <img class="home-logo" id="home-logo" alt="Foxtail logo">
+</div>
+
+<!-- ============ QUIZ ============ -->
+<div class="page" id="page-quiz">
+  <div class="topbar">
+    <span class="back" onclick="showPage('home')">← กลับ</span>
+    <span class="title">🔮 เดารสที่ใช่</span>
+    <span style="width:40px"></span>
+  </div>
+  <div class="quiz-body" id="quiz-body"></div>
+</div>
+
+<!-- ============ STORY ============ -->
+<div class="page" id="page-story">
+  <div class="topbar">
+    <span class="back" onclick="showPage('home')">← กลับ</span>
+    <span class="title">📖 เล่าให้เราฟัง</span>
+    <span style="width:40px"></span>
+  </div>
+  <div class="story-body">
+    <p class="story-lead">เล่าเรื่องของคุณวันนี้ — ความรู้สึก โมเมนต์ หรือสิ่งที่อยากฉลอง แล้วเราจะอ่านเรื่องของคุณและปรุงแก้วจากเรื่องนั้นให้</p>
+    <textarea id="story-text" maxlength="150" placeholder="เช่น วันนี้เพิ่งส่งงานชิ้นใหญ่ที่ทำมาสามเดือน โล่งจนอยากลอยได้..."></textarea>
+    <div class="story-count"><span id="story-len">0</span> / 150</div>
+    <button class="btn fill-coral" style="width:100%" onclick="finishStory()">🍸 ปรุงจากเรื่องของฉัน</button>
+    <div class="story-hint" id="story-hint"></div>
+  </div>
+</div>
+
+<!-- ============ RESULT CARD ============ -->
+<div class="page" id="page-card">
+  <div class="topbar">
+    <span class="back" id="card-back" onclick="showPage('home')">← กลับ</span>
+    <span class="title" id="card-title-bar">การ์ดค็อกเทล</span>
+    <span style="width:40px"></span>
+  </div>
+  <div class="card-page-body">
+    <img id="card-img" class="result-card-img" alt="cocktail card">
+    <div class="card-actions">
+      <button class="btn fill-coral" onclick="downloadCard()">💾 บันทึกรูป</button>
+      <button class="btn" id="card-extra-btn" onclick="cardExtraAction()">🎨 ผสมตามสูตรนี้</button>
+    </div>
+    <p class="hint">กดค้างที่รูปเพื่อบันทึก/แชร์ได้เช่นกัน</p>
+  </div>
+</div>
+
+<!-- ============ MIX ============ -->
+<div class="page" id="page-mix">
+  <div class="topbar">
+    <span class="back" onclick="showPage('home')">← กลับ</span>
+    <span class="title">🎨 ผสมค็อกเทลเอง</span>
+    <span style="width:40px"></span>
+  </div>
+
+  <div class="shaker-section">
+    <div class="shaker-wrap">
+      <div class="shaker-blob"></div>
+      <!-- cocktail shaker (cobbler) วาดมือ -->
+      <svg id="shaker-svg" viewBox="0 0 150 244">
+        <defs>
+          <clipPath id="shaker-clip">
+            <path d="M 30 58 L 52 212 Q 54 226 66 226 L 84 226 Q 96 226 98 212 L 120 58 Z"/>
+          </clipPath>
+          <filter id="wobble">
+            <feTurbulence type="fractalNoise" baseFrequency="0.045" numOctaves="2" result="n"/>
+            <feDisplacementMap in="SourceGraphic" in2="n" scale="2.6"/>
+          </filter>
+          <filter id="watery">
+            <feTurbulence type="fractalNoise" baseFrequency="0.09" numOctaves="2" result="n"/>
+            <feDisplacementMap in="SourceGraphic" in2="n" scale="4"/>
+            <feGaussianBlur stdDeviation="0.6"/>
+          </filter>
+        </defs>
+
+        <!-- ของเหลว + น้ำแข็ง (clip ตามตัว shaker) -->
+        <g clip-path="url(#shaker-clip)" filter="url(#watery)">
+          <g id="liquid-layers"></g>
+          <g id="ice-layer"></g>
+        </g>
+
+        <!-- ตัว shaker ลายเส้นดินสอ -->
+        <g filter="url(#wobble)" fill="none" stroke="#F0E7DB" stroke-width="2.4" stroke-linejoin="round" stroke-linecap="round">
+          <!-- ฝาบน (cap) -->
+          <path d="M 62 8 Q 75 1 88 8 L 91 24 L 59 24 Z" fill="rgba(255,255,255,0.16)"/>
+          <!-- คอ strainer -->
+          <path d="M 55 24 L 95 24 L 101 54 L 49 54 Z" fill="rgba(255,255,255,0.1)"/>
+          <line x1="52" y1="40" x2="98" y2="40" stroke-width="1.1" stroke-dasharray="3,4" stroke="#B8AFA2"/>
+          <!-- ตัว tin -->
+          <path d="M 30 58 L 52 212 Q 54 226 66 226 L 84 226 Q 96 226 98 212 L 120 58 Z"/>
+          <line x1="30" y1="58" x2="120" y2="58"/>
+          <line x1="34" y1="66" x2="116" y2="66" stroke-width="1" stroke-dasharray="4,4" stroke="#B8AFA2"/>
+          <!-- เส้นไฮไลท์ดินสอ -->
+          <path d="M 44 78 L 56 196" stroke-width="1.1" stroke="#B8AFA2" opacity="0.6"/>
+        </g>
+      </svg>
+    </div>
+
+    <div class="shaker-info">
+      <div class="fill-label"><b id="total-ml">0</b> / 100 ml</div>
+      <button class="ice-toggle" id="ice-toggle" onclick="toggleIce()">🧊 น้ำแข็ง <span id="ice-state">ไม่ใส่</span></button>
+      <div class="taste-bars" id="taste-bars"></div>
+      <div class="match-name" id="match-name"></div>
+    </div>
+  </div>
+
+  <div class="ingredients" id="ingredient-list">
+    <div class="loading">กำลังโหลด...</div>
+  </div>
+
+  <div class="confirm-bar">
+    <button class="btn" onclick="resetGlass()">ล้าง</button>
+    <button class="btn fill-mustard" onclick="randomMix()">🎲 สุ่ม</button>
+    <button class="btn fill-coral btn-main" id="btn-confirm" onclick="finishMix()" disabled>✨ เสร็จแล้ว!</button>
+  </div>
+</div>
+
+<!-- ข้อมูลส่วนผสม+ราคาขาย อยู่ไฟล์แยก แก้ได้ที่ foxtail-data.csv (หรือ Google Sheet — ดู SHEET_CSV_URL ในสคริปต์) -->
+<script>
+/* ============================================================
+   แหล่งข้อมูลส่วนผสม + ราคาขาย  (แก้ได้ตลอดเวลา ไม่ต้องแตะไฟล์นี้)
+
+   แบบที่ 1 — ไฟล์ตาราง: แก้ foxtail-data.csv ในโฟลเดอร์เดียวกัน
+              (เปิดด้วย Excel / Numbers / Google Sheets แล้ว Save as CSV)
+
+   แบบที่ 2 — Google Sheet สด (แก้จากมือถือ เห็นผลทันทีไม่ต้องอัปไฟล์):
+              1. ทำชีตให้หัวคอลัมน์ตรงกับ foxtail-data.csv
+              2. File → Share → Publish to web → เลือกชีต → รูปแบบ CSV
+              3. เอาลิงก์ที่ได้มาวางในบรรทัดข้างล่างนี้
+   ============================================================ */
+const SHEET_CSV_URL = ""; // ← วางลิงก์ Google Sheet (CSV) ตรงนี้ ถ้าเว้นว่างจะใช้ foxtail-data.csv
+const CSV_FILE = "foxtail-data.csv";
+
+const CATEGORY_LABELS = { alcohol: "แอลกอฮอล์", juice: "น้ำผลไม้ / ไซรัป", tonic: "โทนิค / โซดา", other: "อื่นๆ" };
+const CATEGORY_WASH = { alcohol: "#17203B", juice: "#A65100", tonic: "#828585", other: "#673311" };
+const MAX_ML = 100;      // 1 แก้ว สูงสุด 100 ml
+const MAX_ING = 8;       // สูงสุด 8 ส่วนผสมต่อแก้ว (เกินนี้รสตีกัน + การ์ดยืดสูงรองรับแล้ว)
+const MAX_DROPS = 4;     // ส่วนผสมแบบหยด (bitters) สูงสุด 4 หยด
+const ML_PER_DROP = 1;   // ใช้คำนวณรส/ดีกรี/ราคา
+
+/* ข้อมูลสำรอง — ใช้เมื่อโหลดตารางไม่สำเร็จ (เช่น เปิดไฟล์ตรงๆ แบบ file://) */
+const FALLBACK_INGREDIENTS = [
+  { id: "vodka", name: "Vodka", category: "alcohol", price: 15, abv: 40, sweet: 0, sour: 0, bitter: 1, color: "#dfe6ee" },
+  { id: "gin", name: "Gin", category: "alcohol", price: 16, abv: 40, sweet: 0, sour: 0, bitter: 2, color: "#dcebe4" },
+  { id: "rum_white", name: "White Rum", category: "alcohol", price: 15, abv: 37, sweet: 1, sour: 0, bitter: 0, color: "#f2ecdc" },
+  { id: "tequila", name: "Tequila", category: "alcohol", price: 18, abv: 38, sweet: 0, sour: 0, bitter: 2, color: "#f5e9c8" },
+  { id: "whiskey", name: "Whiskey", category: "alcohol", price: 20, abv: 40, sweet: 1, sour: 0, bitter: 3, color: "#c8862e" },
+  { id: "triple_sec", name: "Triple Sec", category: "alcohol", price: 14, abv: 30, sweet: 6, sour: 1, bitter: 0, color: "#f7d98c" },
+  { id: "lime", name: "น้ำมะนาว", category: "juice", price: 5, abv: 0, sweet: 0, sour: 9, bitter: 0, color: "#c9e265" },
+  { id: "orange_juice", name: "น้ำส้ม", category: "juice", price: 6, abv: 0, sweet: 6, sour: 3, bitter: 0, color: "#ffa02e" },
+  { id: "cranberry", name: "น้ำแครนเบอร์รี่", category: "juice", price: 7, abv: 0, sweet: 4, sour: 5, bitter: 0, color: "#d63b57" },
+  { id: "simple_syrup", name: "ไซรัปน้ำตาล", category: "juice", price: 4, abv: 0, sweet: 9, sour: 0, bitter: 0, color: "#f3efe2" },
+  { id: "grenadine", name: "เกรนาดีน", category: "juice", price: 6, abv: 0, sweet: 8, sour: 1, bitter: 0, color: "#c1123a" },
+  { id: "pineapple", name: "น้ำสับปะรด", category: "juice", price: 6, abv: 0, sweet: 7, sour: 4, bitter: 0, color: "#f5d442" },
+  { id: "soda", name: "โซดา", category: "tonic", price: 3, abv: 0, sweet: 0, sour: 0, bitter: 0, color: "#e8f1f5" },
+  { id: "tonic_water", name: "โทนิควอเตอร์", category: "tonic", price: 5, abv: 0, sweet: 2, sour: 1, bitter: 3, color: "#eef4ef" },
+  { id: "ginger_beer", name: "จินเจอร์เบียร์", category: "tonic", price: 6, abv: 0, sweet: 3, sour: 1, bitter: 2, color: "#e9c87a" },
+  { id: "cola", name: "โคล่า", category: "tonic", price: 4, abv: 0, sweet: 7, sour: 0, bitter: 1, color: "#4a2712" },
+  { id: "bitters", name: "Angostura Bitters", category: "other", price: 3, abv: 45, sweet: 0, sour: 0, bitter: 9, color: "#7a2e1d", unit: "drop" }
+];
+
+const RECIPES = [
+  { name: "Mojito", parts: { rum_white: 2, lime: 1, simple_syrup: 1, soda: 3 }, tags: ["fresh","fizzy"] },
+  { name: "Margarita", parts: { tequila: 2, triple_sec: 1, lime: 1 }, tags: ["zesty","classic"] },
+  { name: "Screwdriver", parts: { vodka: 2, orange_juice: 4 }, tags: ["fruity","easy"] },
+  { name: "Whiskey Sour", parts: { whiskey: 2, lime: 1, simple_syrup: 1 }, tags: ["classic","warm"] },
+  { name: "Cuba Libre", parts: { rum_white: 2, cola: 4, lime: 1 }, tags: ["easy","fizzy"] },
+  { name: "Gin Tonic", parts: { gin: 2, tonic_water: 4 }, tags: ["classic","fizzy","fresh"] },
+  { name: "Tequila Sunrise", parts: { tequila: 2, orange_juice: 4, grenadine: 1 }, tags: ["fruity","celebrate"] },
+  { name: "Moscow Mule", parts: { vodka: 2, ginger_beer: 4, lime: 1 }, tags: ["fresh","zesty","fizzy"] },
+  { name: "Cosmopolitan", parts: { vodka: 2, triple_sec: 1, cranberry: 2, lime: 1 }, tags: ["celebrate","zesty"] },
+  { name: "Piña Style", parts: { rum_white: 2, pineapple: 4 }, tags: ["fruity","warm","easy"] }
+];
+
+let ingredients = [];
+let amounts = {};     // ml (หรือจำนวนหยด สำหรับ unit=drop)
+let iceOn = false;
+let cardMode = "mix";
+let quizResultMap = null;
+let fontsReady = false;
+
+/* โลโก้ร้าน (ฝัง base64 ย้อมเป็นสีหมึกแล้ว) */
+const LOGO_SRC = "data:image/png;base64,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";
+const logoImg = new Image();
+const logoReady = new Promise(res => { logoImg.onload = res; logoImg.onerror = res; logoImg.src = LOGO_SRC; });
+
+function custName() {
+  return (document.getElementById("cust-name").value || "").trim();
+}
+function isDrop(ing) { return ing && ing.unit === "drop"; }
+function mlOf(ing, amt) { return isDrop(ing) ? amt * ML_PER_DROP : amt; }
+
+/* ---------- fonts ---------- */
+async function ensureFonts() {
+  if (fontsReady) return;
+  try {
+    await Promise.all([
+      document.fonts.load("700 46px Mali"),
+      document.fonts.load("500 26px Mali"),
+      document.fonts.load("300 23px Mali"),
+      document.fonts.load("600 32px Caveat"),
+      document.fonts.ready,
+      logoReady
+    ]);
+  } catch (e) { /* fall back silently */ }
+  fontsReady = true;
+}
+
+/* ---------- data: อ่านจากตาราง CSV (ไฟล์แยก หรือ Google Sheet) ---------- */
+function parseCSV(text) {
+  const rows = [];
+  let row = [], cell = "", q = false;
+  for (let i = 0; i < text.length; i++) {
+    const c = text[i];
+    if (q) {
+      if (c === '"' && text[i + 1] === '"') { cell += '"'; i++; }
+      else if (c === '"') q = false;
+      else cell += c;
+    } else if (c === '"') q = true;
+    else if (c === ",") { row.push(cell); cell = ""; }
+    else if (c === "\n") { row.push(cell); rows.push(row); row = []; cell = ""; }
+    else if (c !== "\r") cell += c;
+  }
+  if (cell !== "" || row.length) { row.push(cell); rows.push(row); }
+  if (!rows.length) return [];
+  const head = rows[0].map(h => h.trim().toLowerCase());
+  const num = v => { const n = parseFloat(v); return isNaN(n) ? 0 : n; };
+  return rows.slice(1).filter(r => r.length > 1 && r[0].trim()).map(r => {
+    const o = {};
+    head.forEach((h, i) => o[h] = (r[i] || "").trim());
+    const ing = {
+      id: o.id,
+      name: o.name || o.id,
+      category: CATEGORY_LABELS[o.category] ? o.category : "other",
+      price: num(o.price),
+      abv: num(o.abv),
+      sweet: num(o.sweet),
+      sour: num(o.sour),
+      bitter: num(o.bitter),
+      color: o.color || "#B8AFA2"
+    };
+    if ((o.unit || "").toLowerCase() === "drop") ing.unit = "drop";
+    return ing;
+  }).filter(i => i.id);
+}
+
+let usingFallback = true;
+
+async function loadIngredients() {
+  ingredients = FALLBACK_INGREDIENTS; // ใช้ได้ทันทีเสมอ เผื่อโหลดตารางไม่สำเร็จ
+  usingFallback = true;
+  try {
+    const res = await fetch(SHEET_CSV_URL || CSV_FILE, { cache: "no-store" });
+    if (res.ok) {
+      const list = parseCSV(await res.text());
+      if (list.length) { ingredients = list; usingFallback = false; }
+    }
+  } catch (e) {
+    // เปิดไฟล์แบบ file:// เบราว์เซอร์จะบล็อก fetch — ใช้ข้อมูลสำรองแทน
+    console.warn("โหลดตารางส่วนผสมไม่ได้ ใช้ข้อมูลสำรองในไฟล์:", e.message);
+  }
+  amounts = {};
+  ingredients.forEach(ing => { amounts[ing.id] = 0; });
+}
+
+/* ---------- navigation ---------- */
+function showPage(name) {
+  document.querySelectorAll(".page").forEach(p => p.classList.remove("active"));
+  document.getElementById("page-" + name).classList.add("active");
+  if (name === "mix") renderMixPage();
+  window.scrollTo(0, 0);
+}
+
+/* ---------- profile math ---------- */
+function totalMl() {
+  return ingredients.reduce((s, ing) => s + mlOf(ing, amounts[ing.id] || 0), 0);
+}
+function getIng(id) { return ingredients.find(i => i.id === id) || FALLBACK_INGREDIENTS.find(i => i.id === id); }
+
+/* map = { id: ml } (แปลงหยดเป็น ml แล้ว) */
+function profileOf(map) {
+  const ids = Object.keys(map).filter(id => map[id] > 0);
+  const tot = ids.reduce((s, id) => s + map[id], 0);
+  let sweet = 0, sour = 0, bitter = 0, alcMl = 0, price = 0;
+  ids.forEach(id => {
+    const ing = getIng(id);
+    if (!ing) return;
+    const w = map[id] / tot;
+    sweet += ing.sweet * w;
+    sour += ing.sour * w;
+    bitter += ing.bitter * w;
+    alcMl += map[id] * (ing.abv / 100);
+    price += (map[id] / 10) * ing.price;
+  });
+  return { active: Object.fromEntries(ids.map(id => [id, map[id]])), tot, sweet, sour, bitter, abv: tot ? (alcMl / tot) * 100 : 0, price };
+}
+
+function amountsToMlMap() {
+  const map = {};
+  ingredients.forEach(ing => {
+    const amt = amounts[ing.id] || 0;
+    if (amt > 0) map[ing.id] = mlOf(ing, amt);
+  });
+  return map;
+}
+
+function findClosestRecipe(active) {
+  const ids = Object.keys(active);
+  if (!ids.length) return null;
+  const tot = ids.reduce((s, id) => s + active[id], 0);
+  const norm = {};
+  ids.forEach(id => norm[id] = active[id] / tot);
+  let best = null, bestScore = -1;
+  RECIPES.forEach(r => {
+    const rIds = Object.keys(r.parts);
+    const rTot = rIds.reduce((s, id) => s + r.parts[id], 0);
+    const rNorm = {};
+    rIds.forEach(id => rNorm[id] = r.parts[id] / rTot);
+    let diff = 0;
+    new Set([...ids, ...rIds]).forEach(id => diff += Math.abs((norm[id] || 0) - (rNorm[id] || 0)));
+    const score = 1 - diff / 2;
+    if (score > bestScore) { bestScore = score; best = r; }
+  });
+  return { recipe: best, score: bestScore };
+}
+
+function matchTitle(p) {
+  const m = findClosestRecipe(p.active);
+  if (!m || !Object.keys(p.active).length) return { text: "", name: "Custom Creation" };
+  if (m.score > 0.75) return { text: `🍹 ใกล้เคียงกับ ${m.recipe.name}`, name: m.recipe.name };
+  if (m.score > 0.5) return { text: `🍸 คล้าย ${m.recipe.name} (custom)`, name: m.recipe.name + " Remix" };
+  return { text: "✨ Custom Creation สูตรเฉพาะของคุณ", name: "Custom Creation" };
+}
+
+/* ---------- MIX page ---------- */
+function renderMixPage() {
+  const list = document.getElementById("ingredient-list");
+  list.innerHTML = "";
+  const byCat = {};
+  ingredients.forEach(ing => (byCat[ing.category] = byCat[ing.category] || []).push(ing));
+
+  Object.keys(CATEGORY_LABELS).forEach(cat => {
+    if (!byCat[cat]) return;
+    const catDiv = document.createElement("div");
+    catDiv.className = "category";
+    catDiv.innerHTML = `<h3><span class="wash" style="background:${CATEGORY_WASH[cat]}"></span>${CATEGORY_LABELS[cat]}</h3>`;
+    byCat[cat].forEach(ing => {
+      const amt = amounts[ing.id] || 0;
+      const card = document.createElement("div");
+      card.className = "ing-card sketch-soft" + (amt > 0 ? " on" : "");
+      card.id = "card-" + ing.id;
+      const control = isDrop(ing) ? `
+        <div class="drop-row">
+          <button class="drop-btn" onclick="stepDrop('${ing.id}', -1)">−</button>
+          <div class="drop-dots" id="dots-${ing.id}">${dropDotsHTML(amt)}</div>
+          <button class="drop-btn" onclick="stepDrop('${ing.id}', 1)">+</button>
+          <span class="amount ${amt === 0 ? 'zero' : ''}" id="amt-${ing.id}">${amt} หยด</span>
+        </div>` : `
+        <div class="slider-row">
+          <input type="range" min="0" max="${MAX_ML}" step="5" value="${amt}" data-id="${ing.id}">
+          <span class="amount ${amt === 0 ? 'zero' : ''}" id="amt-${ing.id}">${amt} ml</span>
+        </div>`;
+      card.innerHTML = `
+        <div class="ing-top">
+          <span class="swatch" style="background:${ing.color || '#aaa'}"></span>
+          <span class="ing-name">${ing.name}</span>
+          <span class="ing-abv">${ing.abv > 0 ? ing.abv + "%" : ""}</span>
+        </div>${control}`;
+      catDiv.appendChild(card);
+    });
+    list.appendChild(catDiv);
+  });
+  if (usingFallback) {
+    const warn = document.createElement("p");
+    warn.style.cssText = "font-size:11px;color:#828585;text-align:center;margin:22px 0 0;font-weight:500;line-height:1.6;";
+    warn.textContent = "⚠️ ยังไม่ได้อ่านตาราง foxtail-data.csv (กำลังใช้ข้อมูลสำรองในไฟล์) — ต้องเปิดผ่านเว็บเซิร์ฟเวอร์หรือ GitHub Pages";
+    list.appendChild(warn);
+  }
+  list.querySelectorAll('input[type=range]').forEach(s => s.addEventListener('input', onSlide));
+  syncIceToggle();
+  updateAll();
+}
+
+function dropDotsHTML(n) {
+  let h = "";
+  for (let i = 1; i <= MAX_DROPS; i++) h += `<span class="drop-dot ${i <= n ? 'filled' : ''}"></span>`;
+  return h;
+}
+
+function activeIngCount(exceptId) {
+  return ingredients.filter(i => i.id !== exceptId && (amounts[i.id] || 0) > 0).length;
+}
+
+let limitTimer = null;
+function flashLimit() {
+  const el = document.getElementById("match-name");
+  el.textContent = `⚠️ เลือกได้สูงสุด ${MAX_ING} ส่วนผสมต่อแก้ว`;
+  clearTimeout(limitTimer);
+  limitTimer = setTimeout(renderTaste, 1800);
+}
+
+function onSlide(e) {
+  const id = e.target.dataset.id;
+  let val = parseInt(e.target.value, 10);
+  const ing = getIng(id);
+  if ((amounts[id] || 0) === 0 && val > 0 && activeIngCount(id) >= MAX_ING) {
+    e.target.value = 0;
+    flashLimit();
+    return;
+  }
+  const others = totalMl() - mlOf(ing, amounts[id] || 0);
+  if (others + val > MAX_ML) { val = Math.max(0, MAX_ML - others); e.target.value = val; }
+  amounts[id] = val;
+  refreshAmount(id, val + " ml", val === 0);
+  updateAll();
+}
+
+function stepDrop(id, dir) {
+  const ing = getIng(id);
+  if ((amounts[id] || 0) === 0 && dir > 0 && activeIngCount(id) >= MAX_ING) {
+    flashLimit();
+    return;
+  }
+  let val = Math.min(MAX_DROPS, Math.max(0, (amounts[id] || 0) + dir));
+  const others = totalMl() - mlOf(ing, amounts[id] || 0);
+  while (val > 0 && others + mlOf(ing, val) > MAX_ML) val--;
+  amounts[id] = val;
+  document.getElementById("dots-" + id).innerHTML = dropDotsHTML(val);
+  refreshAmount(id, val + " หยด", val === 0);
+  updateAll();
+}
+
+function refreshAmount(id, text, isZero) {
+  const badge = document.getElementById("amt-" + id);
+  badge.textContent = text;
+  badge.classList.toggle("zero", isZero);
+  document.getElementById("card-" + id).classList.toggle("on", !isZero);
+}
+
+function toggleIce() {
+  iceOn = !iceOn;
+  syncIceToggle();
+  renderIce();
+}
+function syncIceToggle() {
+  const btn = document.getElementById("ice-toggle");
+  btn.classList.toggle("on", iceOn);
+  document.getElementById("ice-state").textContent = iceOn ? "ใส่" : "ไม่ใส่";
+}
+
+function updateAll() {
+  renderLiquid();
+  renderIce();
+  renderTaste();
+  document.getElementById("total-ml").textContent = totalMl();
+  document.getElementById("btn-confirm").disabled = totalMl() === 0;
+}
+
+function sortedActiveMl() {
+  const map = amountsToMlMap();
+  const active = ingredients.filter(ing => (map[ing.id] || 0) > 0).map(ing => ({ ...ing, ml: map[ing.id] }));
+  const order = { juice: 1, tonic: 2, other: 3, alcohol: 4 };
+  active.sort((a, b) => (b.sweet - a.sweet) || (order[a.category] - order[b.category]));
+  return active;
+}
+
+/* shaker geometry */
+const SHAKER = { top: 62, bottom: 222, x: 24, w: 102 };
+function liquidSurfaceY() {
+  const pxPerMl = (SHAKER.bottom - SHAKER.top) / MAX_ML;
+  return SHAKER.bottom - totalMl() * pxPerMl;
+}
+
+function renderLiquid() {
+  const g = document.getElementById("liquid-layers");
+  g.innerHTML = "";
+  const active = sortedActiveMl();
+  if (!active.length) return;
+  const pxPerMl = (SHAKER.bottom - SHAKER.top) / MAX_ML;
+  let y = SHAKER.bottom;
+  active.forEach(ing => {
+    const h = ing.ml * pxPerMl;
+    const rect = document.createElementNS("http://www.w3.org/2000/svg", "rect");
+    rect.setAttribute("x", SHAKER.x);
+    rect.setAttribute("y", y - h);
+    rect.setAttribute("width", SHAKER.w);
+    rect.setAttribute("height", h + 1);
+    rect.setAttribute("fill", ing.color || "#999");
+    rect.setAttribute("opacity", "0.82");
+    g.appendChild(rect);
+    y -= h;
+  });
+}
+
+/* น้ำแข็งวาดมือ ลอยดุ๊กดิ๊กใกล้ผิวน้ำ */
+function renderIce() {
+  const g = document.getElementById("ice-layer");
+  g.innerHTML = "";
+  if (!iceOn) return;
+  const tot = totalMl();
+  const surface = tot > 0 ? liquidSurfaceY() : SHAKER.bottom - 26;
+  const cubes = [
+    { x: 52, y: surface + 4,  s: 19, r: -8 },
+    { x: 80, y: surface + 12, s: 16, r: 14 },
+    { x: 64, y: surface + 27, s: 17, r: -18 }
+  ];
+  cubes.forEach(c => {
+    const yy = Math.min(c.y, SHAKER.bottom - c.s - 4);
+    const cube = document.createElementNS("http://www.w3.org/2000/svg", "g");
+    cube.setAttribute("class", "ice-cube");
+    cube.innerHTML = `
+      <rect x="${c.x}" y="${yy}" width="${c.s}" height="${c.s}" rx="4"
+            transform="rotate(${c.r} ${c.x + c.s / 2} ${yy + c.s / 2})"
+            fill="rgba(255,255,255,0.55)" stroke="rgba(240,231,219,0.8)" stroke-width="1.6"/>
+      <line x1="${c.x + 4}" y1="${yy + c.s - 5}" x2="${c.x + c.s - 5}" y2="${yy + 4}"
+            transform="rotate(${c.r} ${c.x + c.s / 2} ${yy + c.s / 2})"
+            stroke="rgba(255,255,255,0.9)" stroke-width="1.6" stroke-linecap="round"/>`;
+    g.appendChild(cube);
+  });
+}
+
+function renderTaste() {
+  const p = profileOf(amountsToMlMap());
+  const bars = [
+    { label: "หวาน", value: p.sweet, max: 10, color: "#C7A163" },
+    { label: "เปรี้ยว", value: p.sour, max: 10, color: "#E6DDD2" },
+    { label: "ขม", value: p.bitter, max: 10, color: "#673311" },
+    { label: "ดีกรี", value: p.abv, max: 40, color: "#A65100" }
+  ];
+  document.getElementById("taste-bars").innerHTML = bars.map(b => `
+    <div class="bar-row">
+      <span class="bar-label">${b.label}</span>
+      <div class="bar-track"><div class="bar-fill" style="width:${Math.min(100, (b.value / b.max) * 100)}%; background:${b.color};"></div></div>
+    </div>`).join("");
+  document.getElementById("match-name").textContent = matchTitle(p).text;
+}
+
+function resetGlass() {
+  Object.keys(amounts).forEach(id => amounts[id] = 0);
+  iceOn = false;
+  renderMixPage();
+}
+
+function randomMix() {
+  Object.keys(amounts).forEach(id => amounts[id] = 0);
+  const pick = arr => arr[Math.floor(Math.random() * arr.length)];
+  const spirits = ingredients.filter(i => i.category === "alcohol");
+  const mixers = ingredients.filter(i => i.category === "juice" || i.category === "tonic");
+  if (!spirits.length || !mixers.length) return;
+
+  const spirit = pick(spirits);
+  const nMixers = 1 + Math.floor(Math.random() * 3);
+  const chosen = [];
+  const pool = [...mixers];
+  for (let i = 0; i < nMixers && pool.length; i++) {
+    chosen.push(pool.splice(Math.floor(Math.random() * pool.length), 1)[0]);
+  }
+  const target = 70 + Math.floor(Math.random() * 7) * 5; // 70–100 ml
+  let spiritMl = 25 + Math.floor(Math.random() * 4) * 5;
+  spiritMl = Math.min(spiritMl, target - chosen.length * 10);
+  amounts[spirit.id] = spiritMl;
+  let remain = target - spiritMl;
+  chosen.forEach((m, i) => {
+    if (i === chosen.length - 1) { amounts[m.id] = Math.max(5, Math.round(remain / 5) * 5); }
+    else {
+      const part = Math.max(5, Math.round((remain / (chosen.length - i)) * (0.6 + Math.random() * 0.8) / 5) * 5);
+      amounts[m.id] = Math.min(part, remain - (chosen.length - i - 1) * 5);
+      remain -= amounts[m.id];
+    }
+  });
+  let t = totalMl();
+  if (t > MAX_ML) {
+    const over = t - MAX_ML;
+    const lastId = chosen[chosen.length - 1].id;
+    amounts[lastId] = Math.max(5, amounts[lastId] - over);
+  }
+  iceOn = Math.random() < 0.5;
+  renderMixPage();
+}
+
+/* ---------- QUIZ: การผจญภัยของจิ้งจอกแห่งการสรรค์สร้าง (8 ตอน) ---------- */
+const QUIZ = [
+  { q: "คุณตื่นขึ้นมาและพบว่า ตอนนี้ตัวคุณได้กลายเป็น 🦊 จิ้งจอกแห่งการสรรค์สร้าง คุณเดินไปหน้ากระจกและพบว่า ใบหน้าของคุณตอนนี้รู้สึก...", opts: [
+    { t: "ยิ้ม สดใส สนุก 😄", mod: { tags: ["celebrate","fizzy"] } },
+    { t: "ผ่อนคลาย ไร้ความเครียด ไร้กังวล", mod: { tags: ["easy","fresh"] } },
+    { t: "เหนื่อยล้า อ่อนเพลีย ต้องการความสงบ", mod: { strength: +1, tags: ["warm","easy"] } },
+    { t: "เศร้า เครียด มีเรื่องกังวล", mod: { sweet: +2, tags: ["warm","fruity"] } }
+  ]},
+  { q: "ทันใดนั้น คุณก็เห็นผีเสื้อตัวหนึ่งบินผ่านหน้าคุณไป ผีเสื้อตัวนั้นเรืองแสงสีฟ้า ✨ คุณสนใจจึงวิ่งตามไป จนพบต้นไม้ต้นหนึ่งเต็มไปด้วยผล และผลของมันมีสี...", opts: [
+    { t: "แดง / ชมพู 🍎", mod: { colorPref: "red", sweet: +1 } },
+    { t: "เหลือง / ขาว 🍋", mod: { colorPref: "warm", tags: ["fruity"] } },
+    { t: "ฟ้า / ม่วง 🫐", mod: { colorPref: "fresh", tags: ["fresh"] } },
+    { t: "น้ำตาล / ดำ 🌰", mod: { colorPref: "dark", bitter: +1, tags: ["classic","warm"] } }
+  ]},
+  { q: "คุณลองกัดผลไม้นั้นด้วยความอยากรู้ และพบว่ารสชาติของมันนั้น...", opts: [
+    { t: "เปรี้ยวสดชื่น", mod: { sour: +3 } },
+    { t: "หวานละมุน", mod: { sweet: +3 } },
+    { t: "ขมนิดๆ รสแบบผู้ใหญ่", mod: { bitter: +3, tags: ["classic"] } },
+    { t: "หวานเปรี้ยวขม กลมกล่อมในตัว", mod: { sweet: +1, sour: +1 } }
+  ]},
+  { q: "คุณตัดสินใจเด็ดผลไม้กลับบ้าน และเหลือบไปเห็นที่โคนต้นไม้ มีจิ้งจอกอีกตัวหนึ่ง ที่กำลัง...", opts: [
+    { t: "นั่งกินผลไม้แบบแฮปปี้ ร่าเริง 🦊", mod: { strength: -2 } },
+    { t: "กินไปได้ครึ่งลูก หน้าแดงกรึ่มๆ", mod: {} },
+    { t: "นอนมึนอยู่ใต้โคนต้นไม้ 💫", mod: { strength: +2 } }
+  ]},
+  { q: "เดินออกจากสวนผลไม้ คุณก็เริ่มกระหายน้ำแล้วล่ะ จึงตัดสินใจนำผลไม้ที่ได้มาไปทำเครื่องดื่ม ว่าแต่... จะไปดื่มที่ไหนดี?", opts: [
+    { t: "ผลไม้อร่อยแบบนี้ ต้องเอาไปแชร์ที่งานปาร์ตี้สิ 🎶", mod: { strength: +1, tags: ["celebrate","fizzy"] } },
+    { t: "ริมหาดนั่งชิว ชวนเพื่อนมาอีกสองสามคน 🌊", mod: { tags: ["fruity","fresh"] } },
+    { t: "โซฟาอุ่นๆ ที่บ้าน จิบคนเดียวไม่แบ่งใคร 🛋️", mod: { sweet: +1, tags: ["warm","easy"] } },
+    { t: "ห้องแล็บ ผลไม้แบบนี้ต้องเอาไปทดลอง 🧪", mod: { bitter: +1, tags: ["zesty","classic"] } }
+  ]},
+  { q: "คุณไปถึงที่หมายและเริ่มลงมือทำเครื่องดื่ม คุณอยากให้มันออกมามีรสชาติ...", opts: [
+    { t: "ผลไม้ดีกว่า สนุกๆ ฟรุตตี้ๆ 🍊", mod: { sweet: +1, tags: ["fruity"] } },
+    { t: "อยากได้ฟีลสวนสวยๆ ก็ต้องละมุนแบบดอกไม้สิ 🌸", mod: { sweet: +1, tags: ["fresh","classic"] } },
+    { t: "เน้นสดชื่น ต้องซ่าต้องบ้าบิ่น 🫧", mod: { sour: +1, tags: ["fizzy","zesty"] } },
+    { t: "คลาสสิก ไม่ผสมอะไรทั้งนั้น เพียวๆ ไปเลย 🥃", mod: { strength: +2, bitter: +1, tags: ["classic"] } },
+    { t: "ปล่อยตามใจ อยากใส่อะไรก็ใส่ ให้อารมณ์นำพา 🎲", mod: {} }
+  ]},
+  { q: "เครื่องดื่มของคุณกำลังเข้าเครื่องสรรค์สร้างแล้วล่ะ ⚙️ ระหว่างรอ คุณนึกทบทวนการตัดสินใจทั้งหมดที่ผ่านมา แล้วรู้สึกยังไงบ้าง?", opts: [
+    { t: "สนุกสิ ชอบการทดลองอยู่แล้ว", mod: { tags: ["zesty","celebrate"] } },
+    { t: "เหนื่อย...", mod: { tags: ["easy","warm"] } },
+    { t: "ยังเศร้าอยู่ หวังว่าเครื่องดื่มนี้จะช่วยคลายความเศร้าได้", mod: { sweet: +2, tags: ["warm","fruity"] } },
+    { t: "ชิลๆ เพลินๆ จอยๆ", mod: { tags: ["easy","fresh"] } }
+  ]},
+  { q: "เครื่องดื่มของคุณใกล้เสร็จแล้ว! ก่อนพลังแห่งการสรรค์สร้างจะหมดลง... มีอะไรที่คุณอยากทำเป็นอย่างสุดท้ายไหม?", opts: [
+    { t: "กลายเป็นนักคณิตศาสตร์ที่ท่องเลขตัวสุดท้ายของค่าพายได้ เพื่อไขความลับของโลกนี้ 🔢", mod: {} },
+    { t: "ไปเกิดใหม่เป็นอะไรสักอย่างที่ต่างโลก 🌌", mod: {} },
+    { t: "จะไปต่างโลกทำไม ในเมื่อครองโลกนี้ได้เลย วะฮ่าๆๆๆ 👑", mod: {} },
+    { t: "เพ้อเจ้อมากด้านบน อยู่บนพื้นฐานความจริงบ้าง ขอแค่ใช้เวทมนตร์ได้ก็พอแล้วมั้ย ✨", mod: {} },
+    { t: "หลุดโลกทุกอัน อันนี้สมจริงสุด — อยู่ดีๆ ก็อยากทิปให้ร้าน น้องครับ น้องๆๆ.. 💸", mod: {} }
+  ]}
+];
+
+let quizStep = 0;
+let quizAnswers = null;
+
+function startQuiz() {
+  quizStep = 0;
+  quizAnswers = { sweet: 0, sour: 0, bitter: 0, strength: 0, tags: [], colorPref: null };
+  showPage("quiz");
+  renderQuizStep();
+}
+
+function renderQuizStep() {
+  const body = document.getElementById("quiz-body");
+  const step = QUIZ[quizStep];
+  body.innerHTML = `
+    <div class="quiz-progress">${quizStep + 1} / ${QUIZ.length}</div>
+    <div class="quiz-q">${step.q}</div>
+    ${step.opts.map((o, i) => `<button class="quiz-opt sketch-soft" onclick="answerQuiz(${i})">${o.t}</button>`).join("")}
+  `;
+}
+
+function answerQuiz(i) {
+  const mod = QUIZ[quizStep].opts[i].mod;
+  ["sweet","sour","bitter","strength"].forEach(k => { if (mod[k]) quizAnswers[k] += mod[k]; });
+  if (mod.tags) quizAnswers.tags.push(...mod.tags);
+  if (mod.colorPref) quizAnswers.colorPref = mod.colorPref;
+  quizStep++;
+  if (quizStep < QUIZ.length) renderQuizStep();
+  else finishQuiz();
+}
+
+/* result ขั้นต่ำ 5 ส่วนผสม */
+function buildQuizMap(bestRecipe, want) {
+  const map = recipeToMl(bestRecipe);
+  const MIN_ING = 5;
+
+  const colorGroups = {
+    red: ["grenadine","cranberry"],
+    warm: ["orange_juice","pineapple","triple_sec"],
+    fresh: ["lime","soda","tonic_water","gin"],
+    dark: ["cola","bitters","whiskey"]
+  };
+
+  const candidates = [];
+  const push = id => { if (getIng(id) && !(id in map) && !candidates.includes(id)) candidates.push(id); };
+
+  if (want.colorPref) (colorGroups[want.colorPref] || []).forEach(push);
+  if (want.sweet >= 4) ["grenadine","simple_syrup","pineapple","triple_sec"].forEach(push);
+  if (want.sour >= 4) ["lime","cranberry"].forEach(push);
+  if (want.bitter >= 3) ["bitters","tonic_water"].forEach(push);
+  if (want.tags.includes("fizzy")) ["soda","ginger_beer","tonic_water"].forEach(push);
+  if (want.tags.includes("fruity")) ["orange_juice","pineapple","cranberry"].forEach(push);
+  ["lime","simple_syrup","soda","bitters","orange_juice","grenadine","ginger_beer"].forEach(push);
+
+  let ci = 0;
+  while (Object.keys(map).length < MIN_ING && ci < candidates.length) {
+    const id = candidates[ci++];
+    const ing = getIng(id);
+    const addMl = isDrop(ing) ? 2 * ML_PER_DROP : 15;
+    const largest = Object.keys(map).reduce((a, b) => map[a] >= map[b] ? a : b);
+    if (map[largest] - addMl < 15) continue;
+    map[largest] -= addMl;
+    map[id] = addMl;
+  }
+  return map;
+}
+
+/* เลือกสูตรตั้งต้นที่เข้ากับโปรไฟล์ที่ต้องการมากที่สุด (rand = ตัวสุ่ม ส่งแบบ seeded ได้) */
+function pickBestRecipe(want, rand) {
+  let best = null, bestScore = -Infinity;
+  RECIPES.forEach(r => {
+    const p = profileOf(recipeToMl(r));
+    let score = 0;
+    score -= Math.abs(p.sweet - want.sweet) * 1.2;
+    score -= Math.abs(p.sour - want.sour) * 1.2;
+    score -= Math.abs(p.bitter - want.bitter);
+    score -= Math.abs(p.abv - want.abv) * 0.45;
+    want.tags.forEach(t => { if (r.tags.includes(t)) score += 1.4; });
+    score += rand() * 0.8;
+    if (score > bestScore) { bestScore = score; best = r; }
+  });
+  return best;
+}
+
+async function finishQuiz() {
+  const want = {
+    sweet: 3 + quizAnswers.sweet,
+    sour: 3 + quizAnswers.sour,
+    bitter: 1.5 + quizAnswers.bitter,
+    abv: 12 + quizAnswers.strength * 4,
+    tags: quizAnswers.tags,
+    colorPref: quizAnswers.colorPref
+  };
+  const best = pickBestRecipe(want, Math.random);
+
+  quizResultMap = buildQuizMap(best, want);
+  cardMode = "quiz";
+  await ensureFonts();
+  drawCard({
+    name: best.name + " Remix",
+    sub: "ค็อกเทลที่เข้ากับคุณวันนี้",
+    map: quizResultMap,
+    showPrice: false
+  });
+  document.getElementById("card-title-bar").textContent = "🔮 การ์ดของคุณ";
+  document.getElementById("card-extra-btn").style.display = "inline-block";
+  document.getElementById("card-back").onclick = () => showPage("home");
+  showPage("card");
+}
+
+/* ---------- STORY: อ่านเรื่องเล่า → ปรุงแก้ว (เอนจินในตัว ทำงานออฟไลน์) ---------- */
+const STORY_KEYWORDS = [
+  { k: ["เศร้า","เหงา","ร้องไห้","คิดถึง","อกหัก","เลิกกัน","เสียใจ","น้ำตา","หาย"], mod: { sweet: 2, tags: ["warm","fruity"] } },
+  { k: ["เหนื่อย","งานหนัก","โอที","ไม่ได้นอน","หมดแรง","ท้อ","เครียด"], mod: { strength: 1, tags: ["easy","warm"] } },
+  { k: ["ฉลอง","สำเร็จ","เรียนจบ","วันเกิด","ได้งาน","เลื่อนขั้น","แต่งงาน","ชนะ","ผ่าน"], mod: { strength: 1, tags: ["celebrate","fizzy"] } },
+  { k: ["รัก","แฟน","เดท","จีบ","หวานใจ","คนที่ชอบ","แอบชอบ"], mod: { sweet: 2, colorPref: "red", tags: ["fruity"] } },
+  { k: ["ทะเล","เที่ยว","พักร้อน","ชายหาด","เกาะ","ทริป","เดินทาง"], mod: { tags: ["fruity","fresh"], colorPref: "warm" } },
+  { k: ["ฝน","หนาว","กลางคืน","ดึก"], mod: { sweet: 1, tags: ["warm"] } },
+  { k: ["ร้อน","แดด","เหงื่อ","อบอ้าว"], mod: { sour: 1, tags: ["fresh","fizzy"], colorPref: "fresh" } },
+  { k: ["โกรธ","หัวร้อน","เจ้านาย","ทะเลาะ","หงุดหงิด","รำคาญ"], mod: { bitter: 1, strength: 1, tags: ["zesty"] } },
+  { k: ["ผจญภัย","ลุย","มันส์","ปาร์ตี้","แดนซ์","เต้น"], mod: { strength: 1, tags: ["celebrate","zesty"] } },
+  { k: ["ชิล","สบาย","พักผ่อน","วันหยุด","ขี้เกียจ","นอน"], mod: { tags: ["easy","fresh"] } },
+  { k: ["เท่","คลาสสิก","บาร์","แจ๊ส","วิสกี้","ผู้ใหญ่"], mod: { bitter: 1, strength: 1, tags: ["classic"], colorPref: "dark" } },
+  { k: ["หวาน","ขนม","ช็อกโกแลต","ของหวาน","เค้ก"], mod: { sweet: 2, tags: ["fruity"] } },
+  { k: ["เปรี้ยว","มะนาว","จี๊ด","สดชื่น"], mod: { sour: 2, tags: ["zesty","fresh"] } }
+];
+
+const STORY_NAMES = {
+  celebrate: ["Golden Confetti", "คืนแห่งดาว", "Victory Pour"],
+  warm: ["อ้อมกอดปลายฝน", "Slow Ember", "ผ้าห่มสีชา"],
+  fresh: ["ลมหลังฝน", "Morning Tide", "น้ำค้างปลายหญ้า"],
+  fruity: ["Summer Letter", "แดดเดือนเมษา", "ผลไม้ของหัวใจ"],
+  classic: ["Night Chapter", "แสงเทียนในบาร์", "Old Story"],
+  zesty: ["Spark Notes", "ฟ้าแลบกลางใจ", "Wake-up Call"],
+  fizzy: ["Bubble Diary", "เสียงหัวเราะซ่าๆ", "ฟองแห่งค่ำคืน"],
+  easy: ["Soft Landing", "วันที่ไม่ต้องรีบ", "Lullaby Sip"]
+};
+
+/* hash + seeded random: เรื่องเดียวกันได้แก้วเดิมเสมอ */
+function strHash(s) {
+  let h = 2166136261;
+  for (let i = 0; i < s.length; i++) { h ^= s.charCodeAt(i); h = Math.imul(h, 16777619); }
+  return h >>> 0;
+}
+function mulberry32(a) {
+  return function() {
+    a |= 0; a = a + 0x6D2B79F5 | 0;
+    let t = Math.imul(a ^ a >>> 15, 1 | a);
+    t = t + Math.imul(t ^ t >>> 7, 61 | t) ^ t;
+    return ((t ^ t >>> 14) >>> 0) / 4294967296;
+  };
+}
+
+async function finishStory() {
+  const text = (document.getElementById("story-text").value || "").trim();
+  const hintEl = document.getElementById("story-hint");
+  if (text.length < 4) { hintEl.textContent = "เล่าให้ฟังอีกสักนิดนะ ✍️"; return; }
+  hintEl.textContent = "";
+
+  const acc = { sweet: 0, sour: 0, bitter: 0, strength: 0, tags: [], colorPref: null };
+  STORY_KEYWORDS.forEach(g => {
+    if (g.k.some(k => text.includes(k))) {
+      const m = g.mod;
+      ["sweet","sour","bitter","strength"].forEach(x => { if (m[x]) acc[x] += m[x]; });
+      if (m.tags) acc.tags.push(...m.tags);
+      if (m.colorPref && !acc.colorPref) acc.colorPref = m.colorPref;
+    }
+  });
+  const rand = mulberry32(strHash(text));
+  if (!acc.tags.length) {
+    const all = ["easy","fresh","fruity","classic","fizzy","warm"];
+    acc.tags.push(all[Math.floor(rand() * all.length)]);
+  }
+  const want = {
+    sweet: 3 + acc.sweet,
+    sour: 3 + acc.sour,
+    bitter: 1.5 + acc.bitter,
+    abv: 12 + acc.strength * 4,
+    tags: acc.tags,
+    colorPref: acc.colorPref
+  };
+  const best = pickBestRecipe(want, rand);
+  quizResultMap = buildQuizMap(best, want);
+  cardMode = "quiz";
+  await ensureFonts();
+
+  // ตั้งชื่อจากธีมเด่นของเรื่อง
+  const counts = {};
+  acc.tags.forEach(t => counts[t] = (counts[t] || 0) + 1);
+  const dom = Object.keys(counts).sort((a, b) => counts[b] - counts[a])[0] || "easy";
+  const pool = STORY_NAMES[dom] || STORY_NAMES.easy;
+  const drinkName = pool[Math.floor(rand() * pool.length)];
+  const quote = text.length > 60 ? text.slice(0, 59) + "…" : text;
+
+  drawCard({
+    name: drinkName,
+    sub: "ค็อกเทลจากเรื่องเล่าของคุณ",
+    note: `“ ${quote} ”`,
+    map: quizResultMap,
+    showPrice: false
+  });
+  document.getElementById("card-title-bar").textContent = "📖 การ์ดจากเรื่องของคุณ";
+  document.getElementById("card-extra-btn").style.display = "inline-block";
+  document.getElementById("card-back").onclick = () => showPage("story");
+  showPage("card");
+}
+
+function recipeToMl(recipe) {
+  const totParts = Object.values(recipe.parts).reduce((s, v) => s + v, 0);
+  const map = {};
+  let used = 0;
+  const ids = Object.keys(recipe.parts);
+  ids.forEach((id, i) => {
+    let ml = Math.round((recipe.parts[id] / totParts) * MAX_ML / 5) * 5;
+    if (i === ids.length - 1) ml = MAX_ML - used;
+    map[id] = ml;
+    used += ml;
+  });
+  return map;
+}
+
+/* ---------- finish mix -> เขย่า -> การ์ดสรุป ---------- */
+let shaking = false;
+async function finishMix() {
+  if (totalMl() === 0 || shaking) return;
+  shaking = true;
+  const svg = document.getElementById("shaker-svg");
+  svg.classList.add("shaking");
+  const [_, __] = await Promise.all([
+    ensureFonts(),
+    new Promise(r => setTimeout(r, 880))
+  ]);
+  svg.classList.remove("shaking");
+  shaking = false;
+
+  cardMode = "mix";
+  const p = profileOf(amountsToMlMap());
+  const title = matchTitle(p);
+  drawCard({
+    name: title.name,
+    sub: "ผลงานศิลปะแก้วนี้ของคุณ",
+    map: { ...p.active },
+    showPrice: true        // ราคาโชว์ได้เฉพาะการ์ดสรุปเท่านั้น
+  });
+  document.getElementById("card-title-bar").textContent = "✨ ผลงานของคุณ";
+  document.getElementById("card-extra-btn").style.display = "none";
+  document.getElementById("card-back").onclick = () => showPage("mix");
+  showPage("card");
+}
+
+function cardExtraAction() {
+  if (cardMode === "quiz" && quizResultMap) {
+    Object.keys(amounts).forEach(id => amounts[id] = 0);
+    Object.keys(quizResultMap).forEach(id => {
+      const ing = getIng(id);
+      if (!ing || !(id in amounts)) return;
+      amounts[id] = isDrop(ing) ? Math.min(MAX_DROPS, Math.round(quizResultMap[id] / ML_PER_DROP)) : quizResultMap[id];
+    });
+    iceOn = false;
+    showPage("mix");
+  }
+}
+
+/* ---------- card canvas ---------- */
+let lastCardDataUrl = null;
+
+/* ย่อฟอนต์อัตโนมัติจนข้อความไม่เกินความกว้างที่กำหนด */
+function fitFont(ctx, text, weight, size, family, maxW, minSize = 15) {
+  let s = size;
+  ctx.font = `${weight} ${s}px ${family}`;
+  while (s > minSize && ctx.measureText(text).width > maxW) {
+    s -= 1;
+    ctx.font = `${weight} ${s}px ${family}`;
+  }
+  return s;
+}
+
+function wobblyPoints(x1, y1, x2, y2, segments, amp, seedArr) {
+  const pts = [];
+  for (let i = 0; i <= segments; i++) {
+    const t = i / segments;
+    const wx = (i === 0 || i === segments) ? 0 : seedArr[(seedArr.__i = (seedArr.__i || 0) + 1) % seedArr.length] * amp;
+    const wy = (i === 0 || i === segments) ? 0 : seedArr[(seedArr.__i = (seedArr.__i || 0) + 1) % seedArr.length] * amp;
+    pts.push([x1 + (x2 - x1) * t + wx, y1 + (y2 - y1) * t + wy]);
+  }
+  return pts;
+}
+
+function makeGlassPath(gx, gTop, gBottom, topW, botW) {
+  const seeds = Array.from({ length: 80 }, () => (Math.random() - 0.5) * 2);
+  const left = wobblyPoints(gx - topW / 2, gTop, gx - botW / 2, gBottom - 14, 5, 1.3, seeds);
+  const bottom = wobblyPoints(gx - botW / 2, gBottom, gx + botW / 2, gBottom, 4, 1.0, seeds);
+  const right = wobblyPoints(gx + botW / 2, gBottom - 14, gx + topW / 2, gTop, 5, 1.3, seeds);
+  const rim = wobblyPoints(gx - topW / 2, gTop, gx + topW / 2, gTop, 4, 1.0, seeds);
+  return { left, bottom, right, rim };
+}
+
+function traceGlass(ctx, gp) {
+  ctx.beginPath();
+  gp.left.forEach(([x, y], i) => i === 0 ? ctx.moveTo(x, y) : ctx.lineTo(x, y));
+  ctx.quadraticCurveTo(gp.bottom[0][0], gp.bottom[0][1], gp.bottom[0][0] + 10, gp.bottom[0][1]);
+  gp.bottom.forEach(([x, y], i) => { if (i > 0) ctx.lineTo(x, y); });
+  ctx.quadraticCurveTo(gp.right[0][0], gp.right[0][1] + 8, gp.right[0][0], gp.right[0][1]);
+  gp.right.forEach(([x, y], i) => { if (i > 0) ctx.lineTo(x, y); });
+  ctx.closePath();
+}
+
+function drawCard({ name, sub, map, showPrice, note }) {
+  const activeIds = Object.keys(map).filter(id => map[id] > 0 && getIng(id));
+  const rows = activeIds.length;
+  const LIST_TOP = 648, ROW_H = 44;
+  // ความสูงการ์ดยืดตามจำนวนส่วนผสม (ขั้นต่ำ 1020)
+  const W = 720, H = Math.max(1020, LIST_TOP + (rows - 1) * ROW_H + 195);
+  const canvas = document.createElement("canvas");
+  canvas.width = W; canvas.height = H;
+  const ctx = canvas.getContext("2d");
+
+  /* จัดตำแหน่งเองจากความกว้างจริง — กันข้อความหลุดกรอบ 100% */
+  ctx.textAlign = "left";
+  ctx.textBaseline = "alphabetic";
+  const textC = (t, cx, yy) => ctx.fillText(t, cx - ctx.measureText(t).width / 2, yy); // กึ่งกลาง
+  const textR = (t, rx, yy) => ctx.fillText(t, rx - ctx.measureText(t).width, yy);     // ชิดขวา ยืดไปทางซ้าย
+  const RIGHT = W - 72; // ขอบขวาในกรอบ
+
+  // paper bg + grain
+  ctx.fillStyle = "#F0E7DB";
+  ctx.fillRect(0, 0, W, H);
+  ctx.fillStyle = "rgba(22,27,31,0.05)";
+  for (let i = 0; i < Math.round(900 * H / 1020); i++) ctx.fillRect(Math.random() * W, Math.random() * H, 1.6, 1.6);
+
+  const blob = (x, y, r, color) => {
+    const g = ctx.createRadialGradient(x, y, r * 0.1, x, y, r);
+    g.addColorStop(0, color);
+    g.addColorStop(1, "rgba(255,255,255,0)");
+    ctx.fillStyle = g;
+    ctx.beginPath(); ctx.arc(x, y, r, 0, Math.PI * 2); ctx.fill();
+  };
+  blob(110, 130, 150, "rgba(166,81,0,0.16)");
+  blob(620, 300, 170, "rgba(23,32,59,0.12)");
+  blob(140, H - 190, 160, "rgba(199,161,99,0.22)");
+  blob(600, H - 100, 140, "rgba(207,153,89,0.2)");
+
+  // pencil frame
+  ctx.strokeStyle = "#161B1F";
+  ctx.lineWidth = 3;
+  ctx.beginPath();
+  const wob = () => (Math.random() - 0.5) * 3;
+  ctx.moveTo(34 + wob(), 34 + wob());
+  ctx.lineTo(W - 34 + wob(), 36 + wob());
+  ctx.lineTo(W - 36 + wob(), H - 34 + wob());
+  ctx.lineTo(36 + wob(), H - 36 + wob());
+  ctx.closePath();
+  ctx.stroke();
+
+  // heading — กึ่งกลางทุกบรรทัด + ย่อฟอนต์อัตโนมัติ
+  ctx.font = "600 40px Caveat, cursive";
+  ctx.fillStyle = "#A65100";
+  textC("Foxtail 🦊", W / 2, 96);
+  ctx.fillStyle = "#161B1F";
+  fitFont(ctx, name, "700", 44, "Mali, sans-serif", W - 170);
+  textC(name, W / 2, 158);
+  ctx.fillStyle = "#6F675B";
+  fitFont(ctx, sub, "300", 23, "Mali, sans-serif", W - 170);
+  textC(sub, W / 2, 196);
+  if (note) {
+    ctx.fillStyle = "#8A8175";
+    fitFont(ctx, note, "300", 18, "Mali, sans-serif", W - 150);
+    textC(note, W / 2, 226);
+  }
+
+  // glass
+  const gx = W / 2, gTop = 244, gBottom = 560;
+  const topW = 214, botW = 148;
+  const gp = makeGlassPath(gx, gTop, gBottom, topW, botW);
+
+  const active = Object.keys(map)
+    .map(id => ({ ing: getIng(id), ml: map[id] }))
+    .filter(a => a.ing && a.ml > 0);
+  const order = { juice: 1, tonic: 2, other: 3, alcohol: 4 };
+  active.sort((a, b) => (b.ing.sweet - a.ing.sweet) || (order[a.ing.category] - order[b.ing.category]));
+
+  const innerTop = gTop + 16, innerBottom = gBottom - 6;
+  const pxPerMl = (innerBottom - innerTop) / MAX_ML;
+  let y = innerBottom;
+
+  ctx.save();
+  traceGlass(ctx, gp);
+  ctx.clip();
+  active.forEach(a => {
+    const h = a.ml * pxPerMl;
+    ctx.globalAlpha = 0.85;
+    ctx.fillStyle = a.ing.color || "#999";
+    ctx.beginPath();
+    ctx.moveTo(gx - topW / 2 - 6, y);
+    const topY = y - h;
+    ctx.lineTo(gx - topW / 2 - 6, topY + 3);
+    for (let px = gx - topW / 2 - 6; px <= gx + topW / 2 + 6; px += 14) {
+      ctx.quadraticCurveTo(px + 7, topY + (Math.random() * 3.6 - 1.8), px + 14, topY + 1);
+    }
+    ctx.lineTo(gx + topW / 2 + 6, y);
+    ctx.closePath();
+    ctx.fill();
+    y -= h;
+  });
+  // highlight streak
+  ctx.globalAlpha = 0.18;
+  ctx.fillStyle = "#ffffff";
+  ctx.fillRect(gx - topW / 2 + 18, gTop + 10, 22, gBottom - gTop - 20);
+  ctx.restore();
+  ctx.globalAlpha = 1;
+
+  // outline
+  ctx.strokeStyle = "#161B1F";
+  ctx.lineWidth = 4;
+  ctx.lineJoin = "round";
+  traceGlass(ctx, gp);
+  ctx.stroke();
+  ctx.beginPath();
+  gp.rim.forEach(([x, yy], i) => i === 0 ? ctx.moveTo(x, yy) : ctx.lineTo(x, yy));
+  ctx.stroke();
+  ctx.strokeStyle = "rgba(22,27,31,0.35)";
+  ctx.lineWidth = 2;
+  ctx.save();
+  ctx.translate(1.6, -1);
+  traceGlass(ctx, gp);
+  ctx.stroke();
+  ctx.restore();
+
+  const p = profileOf(map);
+
+  // อัตราส่วนรสชาติ — ใต้แก้ว เหนือรายการส่วนผสม ฟอนต์เล็ก กึ่งกลาง
+  ctx.fillStyle = "#6F675B";
+  const tasteLine = `หวาน ${p.sweet.toFixed(1)} · เปรี้ยว ${p.sour.toFixed(1)} · ขม ${p.bitter.toFixed(1)} · ${p.abv.toFixed(1)}% ABV · ${p.tot} ml`;
+  fitFont(ctx, tasteLine, "300", 19, "Mali, sans-serif", W - 180);
+  textC(tasteLine, W / 2, 598);
+
+  // ingredient list — การ์ดยืดสูงรองรับแล้ว ใช้ระยะ/ฟอนต์เต็มทุกแถว
+  let ly = LIST_TOP;
+  ctx.font = "500 26px Mali, sans-serif";
+  active.forEach(a => {
+    ctx.fillStyle = a.ing.color || "#999";
+    ctx.strokeStyle = "rgba(22,27,31,0.5)";
+    ctx.lineWidth = 1.5;
+    ctx.beginPath();
+    ctx.ellipse(90, ly - 9, 11, 9, 0.3, 0, Math.PI * 2);
+    ctx.fill(); ctx.stroke();
+    ctx.fillStyle = "#161B1F";
+    ctx.fillText(a.ing.name, 116, ly);
+    const amtText = isDrop(a.ing) ? Math.round(a.ml / ML_PER_DROP) + " หยด" : a.ml + " ml";
+    textR(amtText, W - 90, ly);
+    ctx.strokeStyle = "rgba(22,27,31,0.25)";
+    ctx.setLineDash([5, 6]);
+    ctx.beginPath();
+    ctx.moveTo(90, ly + 12); ctx.lineTo(W - 90, ly + 12);
+    ctx.stroke();
+    ctx.setLineDash([]);
+    ly += ROW_H;
+  });
+
+  // ราคา — ชิดขวา ยืดออกทางซ้าย ตำแหน่งคงที่ ไม่มีทางหลุดกรอบ
+  if (showPrice) {
+    ctx.font = "700 38px Mali, sans-serif";
+    ctx.fillStyle = "#161B1F";
+    textR(`ราคา ${Math.round(p.price)} บาท`, RIGHT, H - 118);
+  }
+
+  // โลโก้ร้าน มุมซ้ายล่าง
+  if (logoImg.complete && logoImg.naturalWidth) {
+    const lw = 132, lh = lw * logoImg.naturalHeight / logoImg.naturalWidth;
+    ctx.globalAlpha = 0.85;
+    ctx.drawImage(logoImg, 64, H - 58 - lh, lw, lh);
+    ctx.globalAlpha = 1;
+  }
+
+  // เครดิตศิลปิน — ชิดขวาติดกรอบ ยืดออกทางซ้าย + ย่อฟอนต์ถ้าชื่อยาว
+  const artist = custName();
+  const credit = artist ? `mixed with heart, by ${artist}` : "mixed with heart, by you";
+  ctx.fillStyle = "#9C9284";
+  fitFont(ctx, credit, "600", 30, "Caveat, cursive", RIGHT - (64 + 132 + 24));
+  textR(credit, RIGHT, H - 64);
+
+  lastCardDataUrl = canvas.toDataURL("image/png");
+  document.getElementById("card-img").src = lastCardDataUrl;
+}
+
+function downloadCard() {
+  if (!lastCardDataUrl) return;
+  const a = document.createElement("a");
+  a.href = lastCardDataUrl;
+  a.download = "foxtail-cocktail.png";
+  document.body.appendChild(a);
+  a.click();
+  a.remove();
+}
+
+/* init */
+document.getElementById("home-logo").src = LOGO_SRC;
+document.getElementById("story-text").addEventListener("input", e => {
+  document.getElementById("story-len").textContent = e.target.value.length;
+});
+ensureFonts();
+(async function init() {
+  await loadIngredients();
+  if (document.getElementById("page-mix").classList.contains("active")) renderMixPage();
+})();
+</script>
+
+</body>
+</html>
