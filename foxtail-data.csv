@@ -13,9 +13,10 @@ lemom,น้ำเลมอน,juice,20,0,4,7,0,#ffea4d,
 coconut,น้ำมะพร้าว,juice,20,0,5,0,1,#ffffff,
 orange_juice,น้ำส้ม,juice,20,0,6,3,0,#ffa73d,
 cranberry,น้ำแครนเบอร์รี่,juice,22.5,0,4,5,0,#db405b,
-simple_syrup,ไซรัปน้ำตาล,juice,15,0,9,0,0,#f3efe2,
 grenadine,เกรนาดีน,juice,20,0,8,1,0,#7d2699,
 pineapple,น้ำสับปะรด,juice,20,0,7,4,0,#f5d536,
+simple_syrup,ไซรัปน้ำตาล,juice,15,0,9,0,0,#f3efe2,
+lavender,ไซรัป ลาเวนเดอร์,juice,20,0,7,0,0,#b968d4
 soda,โซดา,tonic,15,0,0,0,0,#e8f1f5,
 tonic_water,โทนิควอเตอร์,tonic,17.5,0,2,1,3,#eef4ef,
 ginger_beer,จินเจอร์เบียร์,tonic,20,0,3,1,2,#e8e3d5,
@@ -24,3 +25,4 @@ bitters,Angostura Bitters,other,12.5,45,0,0,9,#7a2e1d,drop
 citric,citric acid,other,15,0,0,5,0,#ffea00,drop
 malic,malic acid,other,15,0,0,5,0,#b0eb94,drop
 foam,foamer,other,15,0,0,0,0,#d4d4d4,drop
+rose_water,น้ำกุหลาบ,other,20,0,0,0,0,#d4687c,drop
